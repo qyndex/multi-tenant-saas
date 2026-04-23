@@ -2,20 +2,37 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import LoginPage from "@/app/auth/login/page";
 
-// Mock next-auth/react
-const mockSignIn = vi.fn();
-vi.mock("next-auth/react", () => ({
-  signIn: (...args: unknown[]) => mockSignIn(...args),
+// Mock Supabase client
+const mockSignInWithPassword = vi.fn().mockResolvedValue({ error: null });
+const mockSignUp = vi.fn().mockResolvedValue({ error: null });
+const mockSignInWithOAuth = vi.fn().mockResolvedValue({ error: null });
+
+vi.mock("@/lib/supabase/client", () => ({
+  createClient: () => ({
+    auth: {
+      signInWithPassword: mockSignInWithPassword,
+      signUp: mockSignUp,
+      signInWithOAuth: mockSignInWithOAuth,
+    },
+  }),
 }));
 
 describe("LoginPage", () => {
   beforeEach(() => {
-    mockSignIn.mockClear();
+    mockSignInWithPassword.mockClear();
+    mockSignUp.mockClear();
+    mockSignInWithOAuth.mockClear();
   });
 
   it("renders the sign-in heading", () => {
     render(<LoginPage />);
     expect(screen.getByRole("heading", { name: /sign in/i })).toBeInTheDocument();
+  });
+
+  it("renders email and password inputs", () => {
+    render(<LoginPage />);
+    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
   });
 
   it("renders the GitHub sign-in button", () => {
@@ -29,18 +46,42 @@ describe("LoginPage", () => {
     expect(screen.getByText(/sign in to access your dashboard/i)).toBeInTheDocument();
   });
 
-  it("calls signIn with github provider and dashboard callback on button click", () => {
+  it("calls signInWithOAuth with github provider on GitHub button click", () => {
     render(<LoginPage />);
     const button = screen.getByRole("button", { name: /continue with github/i });
     fireEvent.click(button);
-    expect(mockSignIn).toHaveBeenCalledTimes(1);
-    expect(mockSignIn).toHaveBeenCalledWith("github", { callbackUrl: "/dashboard" });
+    expect(mockSignInWithOAuth).toHaveBeenCalledTimes(1);
+    expect(mockSignInWithOAuth).toHaveBeenCalledWith(
+      expect.objectContaining({ provider: "github" })
+    );
   });
 
-  it("button has accessible name without relying solely on color", () => {
+  it("toggles between sign in and sign up modes", () => {
     render(<LoginPage />);
-    const button = screen.getByRole("button", { name: /continue with github/i });
-    // button text is sufficient — no aria-label needed, but verify it's a button role
-    expect(button.tagName).toBe("BUTTON");
+    // Initially in sign in mode
+    expect(screen.getByRole("heading", { name: /sign in/i })).toBeInTheDocument();
+
+    // Click "Sign Up" toggle
+    const toggleButton = screen.getByRole("button", { name: /switch to sign up/i });
+    fireEvent.click(toggleButton);
+
+    // Now in sign up mode
+    expect(screen.getByRole("heading", { name: /create account/i })).toBeInTheDocument();
+  });
+
+  it("submits email/password sign-in on form submission", () => {
+    render(<LoginPage />);
+    const emailInput = screen.getByLabelText(/email/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const submitButton = screen.getByRole("button", { name: /sign in with email/i });
+
+    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
+    fireEvent.change(passwordInput, { target: { value: "password123" } });
+    fireEvent.click(submitButton);
+
+    expect(mockSignInWithPassword).toHaveBeenCalledWith({
+      email: "test@example.com",
+      password: "password123",
+    });
   });
 });

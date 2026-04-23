@@ -5,10 +5,11 @@ RUN npm install --legacy-peer-deps
 COPY . .
 RUN npx prisma generate
 
-# Build-time env vars (defaults for Docker build)
-ARG DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
-ENV DATABASE_URL=${DATABASE_URL}
-RUN npx prisma generate
+# Build-time env vars (defaults for Docker build — override at runtime)
+ARG NEXT_PUBLIC_SUPABASE_URL=http://host.docker.internal:54321
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder
+ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
 RUN npm run build
 
 FROM node:20-alpine AS runner

@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import Home from "@/app/page";
 
-// next/link renders as an <a> in test — no special mock needed
 describe("Home (landing page)", () => {
   it("renders the main heading", () => {
     render(<Home />);
@@ -14,7 +13,7 @@ describe("Home (landing page)", () => {
   it("renders the tagline", () => {
     render(<Home />);
     expect(
-      screen.getByText(/built with next\.js, prisma, and nextauth/i)
+      screen.getByText(/built with next\.js, supabase, and typescript/i)
     ).toBeInTheDocument();
   });
 
@@ -25,11 +24,11 @@ describe("Home (landing page)", () => {
     expect(signInLink).toHaveAttribute("href", "/auth/login");
   });
 
-  it("renders a Dashboard link pointing to /dashboard", () => {
+  it("renders a Sign Up link pointing to /auth/signup", () => {
     render(<Home />);
-    const dashboardLink = screen.getByRole("link", { name: /dashboard/i });
-    expect(dashboardLink).toBeInTheDocument();
-    expect(dashboardLink).toHaveAttribute("href", "/dashboard");
+    const signUpLink = screen.getByRole("link", { name: /sign up/i });
+    expect(signUpLink).toBeInTheDocument();
+    expect(signUpLink).toHaveAttribute("href", "/auth/signup");
   });
 
   it("renders both CTA links", () => {
