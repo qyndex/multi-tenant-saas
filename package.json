@@ -1,0 +1,27 @@
+{
+  "name": "multi-tenant-saas",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "14.2.28",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "prisma": "6.19.2",
+    "@prisma/client": "6.19.2",
+    "stripe": "15.12.0",
+    "next-auth": "4.24.13"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "@types/react": "19.2.14",
+    "@types/node": "20.19.37",
+    "tailwindcss": "^3.4.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0"
+  }
+}

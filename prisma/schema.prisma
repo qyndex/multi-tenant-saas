@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String       @id @default(cuid())
+  email      String       @unique
+  name       String?
+  memberships Membership[]
+  createdAt  DateTime     @default(now())
+}
+
+model Org {
+  id           String         @id @default(cuid())
+  name         String
+  slug         String         @unique
+  memberships  Membership[]
+  teams        Team[]
+  subscription Subscription?
+  createdAt    DateTime       @default(now())
+}
+
+model Team {
+  id    String @id @default(cuid())
+  name  String
+  orgId String
+  org   Org    @relation(fields: [orgId], references: [id])
+}
+
+model Membership {
+  id     String @id @default(cuid())
+  role   String @default("member")
+  userId String
+  orgId  String
+  user   User   @relation(fields: [userId], references: [id])
+  org    Org    @relation(fields: [orgId], references: [id])
+  @@unique([userId, orgId])
+}
+
+model Subscription {
+  id              String   @id @default(cuid())
+  stripeCustomerId String?
+  plan            String   @default("free")
+  status          String   @default("active")
+  orgId           String   @unique
+  org             Org      @relation(fields: [orgId], references: [id])
+  createdAt       DateTime @default(now())
+}
