@@ -31,7 +31,7 @@ export default async function DashboardPage({
     .eq("user_id", user.id);
 
   const orgs: OrgWithRole[] = (memberships ?? []).map((m) => ({
-    ...(m.organizations as OrgWithRole),
+    ...(m.organizations as unknown as OrgWithRole),
     role: m.role,
   }));
 

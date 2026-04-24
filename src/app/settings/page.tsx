@@ -31,7 +31,7 @@ export default async function SettingsPage({
     .in("role", ["owner", "admin"]);
 
   const managedOrgs = (memberships ?? []).map((m) => ({
-    ...(m.organizations as { id: string; name: string; slug: string; plan: string }),
+    ...(m.organizations as unknown as { id: string; name: string; slug: string; plan: string }),
     role: m.role,
   }));
 
