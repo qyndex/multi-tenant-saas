@@ -74,6 +74,15 @@ VALUES (
 -- PROFILES (normally auto-created by trigger, but seed needs explicit inserts)
 -- ============================================================================
 
+-- seed auth.users first (profiles.id FKs auth.users); trigger creates full profiles
+INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at, raw_user_meta_data, created_at, updated_at, instance_id, aud, role) VALUES
+  ('a1111111-1111-1111-1111-111111111111','alice@example.com',crypt('password123',gen_salt('bf')),now(),'{"full_name":"Alice Johnson","avatar_url":"https://api.dicebear.com/7.x/initials/svg?seed=AJ"}'::jsonb,now(),now(),'00000000-0000-0000-0000-000000000000','authenticated','authenticated'),
+  ('b2222222-2222-2222-2222-222222222222','bob@example.com',crypt('password123',gen_salt('bf')),now(),'{"full_name":"Bob Smith","avatar_url":"https://api.dicebear.com/7.x/initials/svg?seed=BS"}'::jsonb,now(),now(),'00000000-0000-0000-0000-000000000000','authenticated','authenticated'),
+  ('c3333333-3333-3333-3333-333333333333','carol@example.com',crypt('password123',gen_salt('bf')),now(),'{"full_name":"Carol Williams","avatar_url":"https://api.dicebear.com/7.x/initials/svg?seed=CW"}'::jsonb,now(),now(),'00000000-0000-0000-0000-000000000000','authenticated','authenticated'),
+  ('d4444444-4444-4444-4444-444444444444','dave@example.com',crypt('password123',gen_salt('bf')),now(),'{"full_name":"Dave Brown","avatar_url":"https://api.dicebear.com/7.x/initials/svg?seed=DB"}'::jsonb,now(),now(),'00000000-0000-0000-0000-000000000000','authenticated','authenticated'),
+  ('e5555555-5555-5555-5555-555555555555','eve@example.com',crypt('password123',gen_salt('bf')),now(),'{"full_name":"Eve Davis","avatar_url":"https://api.dicebear.com/7.x/initials/svg?seed=ED"}'::jsonb,now(),now(),'00000000-0000-0000-0000-000000000000','authenticated','authenticated')
+ON CONFLICT (id) DO NOTHING;
+
 INSERT INTO public.profiles (id, email, full_name, avatar_url) VALUES
   ('a1111111-1111-1111-1111-111111111111', 'alice@example.com', 'Alice Johnson', 'https://api.dicebear.com/7.x/initials/svg?seed=AJ'),
   ('b2222222-2222-2222-2222-222222222222', 'bob@example.com',   'Bob Smith',     'https://api.dicebear.com/7.x/initials/svg?seed=BS'),
@@ -87,8 +96,8 @@ ON CONFLICT (id) DO NOTHING;
 -- ============================================================================
 
 INSERT INTO public.organizations (id, name, slug, plan, owner_id) VALUES
-  ('org-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Acme Corp',       'acme-corp',   'pro',  'a1111111-1111-1111-1111-111111111111'),
-  ('org-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Globex Industries','globex-ind',  'free', 'c3333333-3333-3333-3333-333333333333')
+  ('7525e62a-2221-689e-956f-71d731be2747', 'Acme Corp',       'acme-corp',   'pro',  'a1111111-1111-1111-1111-111111111111'),
+  ('bf0054ac-eea0-c1c3-775d-0c6b7060400f', 'Globex Industries','globex-ind',  'free', 'c3333333-3333-3333-3333-333333333333')
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================================
@@ -97,12 +106,12 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public.org_members (org_id, user_id, role, joined_at) VALUES
   -- Acme Corp members
-  ('org-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'a1111111-1111-1111-1111-111111111111', 'owner',  now()),
-  ('org-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'b2222222-2222-2222-2222-222222222222', 'admin',  now()),
-  ('org-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'c3333333-3333-3333-3333-333333333333', 'member', now()),
-  ('org-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'e5555555-5555-5555-5555-555555555555', 'viewer', now()),
+  ('7525e62a-2221-689e-956f-71d731be2747', 'a1111111-1111-1111-1111-111111111111', 'owner',  now()),
+  ('7525e62a-2221-689e-956f-71d731be2747', 'b2222222-2222-2222-2222-222222222222', 'admin',  now()),
+  ('7525e62a-2221-689e-956f-71d731be2747', 'c3333333-3333-3333-3333-333333333333', 'member', now()),
+  ('7525e62a-2221-689e-956f-71d731be2747', 'e5555555-5555-5555-5555-555555555555', 'viewer', now()),
   -- Globex Industries members
-  ('org-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'c3333333-3333-3333-3333-333333333333', 'owner',  now()),
-  ('org-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'd4444444-4444-4444-4444-444444444444', 'member', now()),
-  ('org-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'e5555555-5555-5555-5555-555555555555', 'viewer', now())
+  ('bf0054ac-eea0-c1c3-775d-0c6b7060400f', 'c3333333-3333-3333-3333-333333333333', 'owner',  now()),
+  ('bf0054ac-eea0-c1c3-775d-0c6b7060400f', 'd4444444-4444-4444-4444-444444444444', 'member', now()),
+  ('bf0054ac-eea0-c1c3-775d-0c6b7060400f', 'e5555555-5555-5555-5555-555555555555', 'viewer', now())
 ON CONFLICT (org_id, user_id) DO NOTHING;
